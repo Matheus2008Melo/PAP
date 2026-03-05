@@ -1,0 +1,108 @@
+Table users {
+  id bigint [primary key]
+  name varchar
+  email varchar [unique]
+  email_verified_at timestamp
+  password varchar
+  role varchar [note: "admin ou aluno"]
+  remember_token varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table disciplinas {
+  id bigint [primary key]
+  nome varchar [unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table tags {
+  id bigint [primary key]
+  nome varchar [unique]
+  slug varchar [unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table projetos {
+  id bigint [primary key]
+  user_id bigint
+  disciplina_id bigint [note: "Disciplina Principal"]
+  titulo varchar
+  descricao text
+  ficheiro_caminho varchar
+  ano_letivo varchar
+  status varchar [default: "pendente", note: "pendente, aprovado, rejeitado"]
+  observacoes text
+  rating_average decimal [default: 0]
+  rating_count integer [default: 0]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table ratings {
+  id bigint [primary key]
+  user_id bigint
+  projeto_id bigint
+  rating decimal
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table conversations {
+  id bigint [primary key]
+  sender_id bigint
+  receiver_id bigint
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table messages {
+  id bigint [primary key]
+  conversation_id bigint
+  user_id bigint
+  body text
+  read_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table disciplina_projeto {
+  projeto_id bigint
+  disciplina_id bigint [note: "Disciplinas Secundárias / Parceiras"]
+}
+
+Table projeto_tag {
+  projeto_id bigint
+  tag_id bigint
+}
+
+Table sessions {
+  id varchar [primary key]
+  user_id bigint
+  ip_address varchar
+  user_agent text
+  payload longtext
+  last_activity integer
+}
+
+Ref: projetos.user_id > users.id
+Ref: projetos.disciplina_id > disciplinas.id
+
+Ref: disciplina_projeto.projeto_id > projetos.id
+Ref: disciplina_projeto.disciplina_id > disciplinas.id
+
+Ref: projeto_tag.projeto_id > projetos.id
+Ref: projeto_tag.tag_id > tags.id
+
+Ref: sessions.user_id > users.id
+
+Ref: ratings.user_id > users.id
+Ref: ratings.projeto_id > projetos.id
+
+Ref: conversations.sender_id > users.id
+Ref: conversations.receiver_id > users.id
+
+Ref: messages.conversation_id > conversations.id
+Ref: messages.user_id > users.id
